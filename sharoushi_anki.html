@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社労士試験 完全数字暗記カード</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --text: #1a1816;
+    --text2: #6b6560;
+    --text3: #a09a94;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  /* ヘッダー */
+  .site-header {
+    background: #1a1816;
+    color: #f5f4f0;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid #c8a96e;
+  }
+  .site-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .site-subtitle { font-size: 11px; color: #a09a94; margin-top: 2px; }
+  .header-stats { display: flex; gap: 1rem; }
+  .hstat { text-align: right; }
+  .hstat-num { font-size: 20px; font-weight: 700; color: #c8a96e; line-height: 1; }
+  .hstat-label { font-size: 10px; color: #a09a94; margin-top: 2px; }
+
+  /* レイアウト */
+  .layout { display: flex; min-height: calc(100vh - 64px); }
+
+  /* サイドバー */
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: #1a1816;
+    padding: 1rem 0;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+  .sidebar-label {
+    font-size: 10px;
+    color: #6b6560;
+    letter-spacing: 0.08em;
+    padding: 0 1rem;
+    margin-bottom: 6px;
+    margin-top: 12px;
+  }
+  .sidebar-label:first-child { margin-top: 0; }
+  .sidebar-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 9px 1rem;
+    font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    color: #a09a94;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+  .sidebar-btn:hover { color: #f5f4f0; background: rgba(255,255,255,0.05); }
+  .sidebar-btn.active { color: #f5f4f0; border-left-color: #c8a96e; background: rgba(200,169,110,0.1); }
+  .sidebar-count {
+    display: inline-block;
+    font-size: 10px;
+    background: rgba(255,255,255,0.1);
+    color: #a09a94;
+    border-radius: 100px;
+    padding: 1px 6px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* メインコンテンツ */
+  .main { flex: 1; padding: 1.5rem; min-width: 0; }
+
+  /* セクションタブ */
+  .section-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.2rem;
+  }
+  .section-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    border: 1px solid var(--border2);
+    border-radius: 100px;
+    background: var(--surface);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .section-btn:hover { background: var(--surface2); color: var(--text); }
+  .section-btn.active { background: #1a1816; color: #f5f4f0; border-color: #1a1816; }
+
+  /* カードグリッド */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+
+  /* カード */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    min-height: 95px;
+    position: relative;
+    user-select: none;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-color: var(--border2);
+  }
+  .card.flipped { background: #1a1816; border-color: #c8a96e; }
+  .card.flipped .front { display: none; }
+  .card.flipped .back { display: block; }
+  .card .back { display: none; }
+  .card-tag {
+    font-size: 10px;
+    color: var(--text3);
+    margin-bottom: 5px;
+    letter-spacing: 0.04em;
+  }
+  .card-q { font-size: 13px; color: var(--text); line-height: 1.55; }
+  .card-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-bottom: 6px;
+    background: rgba(200,169,110,0.2);
+    color: #c8a96e;
+  }
+  .card-a {
+    font-size: 18px;
+    font-weight: 700;
+    color: #c8a96e;
+    margin-bottom: 5px;
+    line-height: 1.3;
+  }
+  .card-note { font-size: 11px; color: #a09a94; line-height: 1.5; }
+
+  /* 進捗バー */
+  .progress-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .progress-label { font-size: 12px; color: var(--text2); }
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 100px;
+    min-width: 100px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: #c8a96e;
+    border-radius: 100px;
+    transition: width 0.3s;
+  }
+  .progress-nums { font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; }
+  .reset-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: 'Noto Sans JP', sans-serif;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--text2);
+    cursor: pointer;
+  }
+  .reset-btn:hover { background: var(--surface2); }
+
+  /* ヒント */
+  .hint { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 1rem; }
+
+  /* モバイル */
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+    .main { padding: 1rem; }
+    .cards-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .card { min-height: 80px; padding: 10px 12px; }
+    .card-a { font-size: 16px; }
+    .mobile-subject-nav {
+      display: flex;
+      overflow-x: auto;
+      gap: 6px;
+      margin-bottom: 1rem;
+      padding-bottom: 4px;
+    }
+    .mobile-subject-btn {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: 'Noto Sans JP', sans-serif;
+      border: 1px solid var(--border2);
+      border-radius: 100px;
+      background: var(--surface);
+      color: var(--text2);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mobile-subject-btn.active { background: #1a1816; color: #f5f4f0; border-color: #1a1816; }
+    .hstat { display: none; }
+  }
+  @media (min-width: 641px) {
+    .mobile-subject-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div>
+    <div class="site-title">社労士試験 完全数字暗記カード</div>
+    <div class="site-subtitle">タップで答えを確認・もう一度タップで問題に戻る</div>
+  </div>
+  <div class="header-stats">
+    <div class="hstat">
+      <div class="hstat-num" id="total-count">0</div>
+      <div class="hstat-label">総カード数</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num" id="seen-count">0</div>
+      <div class="hstat-label">確認済み</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main">
+    <div class="mobile-subject-nav" id="mobile-subject-nav"></div>
+    <div class="section-nav" id="section-nav"></div>
+    <div class="progress-bar">
+      <span class="progress-label">このページの確認済み</span>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <span class="progress-nums" id="prog-nums">0 / 0</span>
+      <button class="reset-btn" onclick="resetFlips()">リセット</button>
+    </div>
+    <p class="hint">📖 カードをタップ → 答えが表示されます</p>
+    <div class="cards-grid" id="cards-grid"></div>
+  </main>
+</div>
+
+<script>
+const subjects = [
+  {
+    name: "労働基準法",
+    sections: {
+      "割増賃金": [
+        { q: "時間外労働（月60時間以内）の割増率", a: "25%以上", note: "法定労働時間1日8h・週40hを超えた分" },
+        { q: "時間外労働（月60時間超）の割増率", a: "50%以上", note: "中小企業も2023年4月から適用" },
+        { q: "深夜労働（22時〜5時）の割増率", a: "25%以上", note: "時間外と重複する場合は50%以上" },
+        { q: "法定休日労働の割増率", a: "35%以上", note: "法定外休日は25%でよい" },
+        { q: "時間外＋深夜が重なった場合", a: "50%以上", note: "25%＋25%の合算" },
+        { q: "休日＋深夜が重なった場合", a: "60%以上", note: "35%＋25%の合算" },
+        { q: "月60時間超の代替休暇換算率", a: "50%−25%＝25%分", note: "代替休暇として付与できる" },
+      ],
+      "労働時間・36協定": [
+        { q: "法定労働時間（1日）", a: "8時間", note: "この上限を超えると割増賃金が必要" },
+        { q: "法定労働時間（1週）", a: "40時間", note: "特例業種は44時間" },
+        { q: "特例業種（常時10人未満）の週労働時間", a: "44時間", note: "商業・映画演劇・保健衛生・接客娯楽業" },
+        { q: "36協定の時間外労働の限度（月・原則）", a: "45時間", note: "年間360時間が原則上限" },
+        { q: "36協定の時間外労働の限度（年・原則）", a: "360時間", note: "特別条項なしの場合" },
+        { q: "36協定・特別条項の時間外年間上限", a: "720時間", note: "休日労働を含まず" },
+        { q: "36協定・特別条項の時間外＋休日の月上限", a: "100時間未満", note: "単月。2〜6か月平均は80時間以内" },
+        { q: "36協定・複数月平均の上限", a: "80時間以内", note: "2〜6か月のどの期間も超えてはいけない" },
+        { q: "特別条項を使える月数（年）", a: "6ヶ月", note: "年間で45時間を超えられるのは6ヶ月まで" },
+        { q: "1ヶ月単位変形の上限（1日・1週）", a: "10時間・52時間", note: "" },
+        { q: "1年単位変形の上限（1日・1週）", a: "10時間・52時間", note: "連続労働は6日まで" },
+        { q: "1年単位変形で週48時間超を許可できる週数", a: "連続3週以下・年14週以下", note: "3ヶ月超の場合" },
+        { q: "フレックスタイム制の清算期間上限", a: "3ヶ月", note: "1ヶ月超は届出が必要" },
+        { q: "高度プロフェッショナル制度の年収要件", a: "1,075万円以上", note: "職務の範囲が明確な高度専門職" },
+      ],
+      "休憩・休日": [
+        { q: "休憩時間（労働時間6時間超）", a: "45分以上", note: "6時間ちょうどは休憩不要" },
+        { q: "休憩時間（労働時間8時間超）", a: "60分以上", note: "8時間ちょうどは45分でよい" },
+        { q: "法定休日（1週）", a: "1日以上", note: "4週4日でも可（変形休日制）" },
+        { q: "変形休日制の最低付与日数", a: "4週間に4日", note: "就業規則等に定めが必要" },
+      ],
+      "年次有給休暇": [
+        { q: "年休付与の最低継続勤務期間", a: "6ヶ月", note: "かつ全労働日の8割以上出勤" },
+        { q: "年休付与日数（6ヶ月）", a: "10日", note: "フルタイムの場合" },
+        { q: "年休付与日数（1年6ヶ月）", a: "11日", note: "" },
+        { q: "年休付与日数（2年6ヶ月）", a: "12日", note: "" },
+        { q: "年休付与日数（3年6ヶ月）", a: "14日", note: "" },
+        { q: "年休付与日数（4年6ヶ月）", a: "16日", note: "" },
+        { q: "年休付与日数（5年6ヶ月）", a: "18日", note: "" },
+        { q: "年休付与日数（6年6ヶ月以上）", a: "20日", note: "最大値" },
+        { q: "年5日取得義務の対象者", a: "年休10日以上付与の労働者", note: "使用者が時季指定する義務あり" },
+        { q: "年休の時効（繰越）", a: "2年間", note: "翌年に繰り越し可・2年で消滅" },
+        { q: "比例付与の対象（週所定労働日数）", a: "4日以下かつ週30時間未満", note: "短時間労働者" },
+        { q: "週1日の比例付与（6ヶ月）", a: "1日", note: "週2日→3日、週3日→5日、週4日→7日" },
+      ],
+      "解雇・退職": [
+        { q: "解雇予告期間", a: "30日前", note: "30日分の平均賃金（解雇予告手当）でも可" },
+        { q: "解雇予告不要の試用期間", a: "14日以内", note: "14日を超えたら予告が必要" },
+        { q: "解雇制限（業務上傷病の療養）", a: "療養中＋30日間", note: "打切補償支払後は解雇可" },
+        { q: "打切補償を支払える療養期間", a: "3年経過後", note: "1,200日分を支払い解雇可" },
+        { q: "産前産後の解雇制限", a: "産前産後休業中＋30日間", note: "" },
+        { q: "退職証明書の請求可能期間", a: "退職後2年以内", note: "請求後は即時交付義務" },
+        { q: "金品の返還期限", a: "請求から7日以内", note: "賃金・退職金等" },
+      ],
+      "賃金・就業規則": [
+        { q: "平均賃金の算定期間", a: "直前3ヶ月", note: "事由発生日以前3ヶ月の賃金" },
+        { q: "賃金の消滅時効（2020年4月〜）", a: "5年（当面3年）", note: "退職金は5年" },
+        { q: "減給制裁の限度額（1回）", a: "平均賃金の1日分の半額以下", note: "" },
+        { q: "減給制裁の限度額（1賃金支払期の総額）", a: "賃金総額の10分の1以下", note: "" },
+        { q: "就業規則の作成・届出義務", a: "常時10人以上", note: "パート・アルバイト含む" },
+        { q: "労働者名簿・賃金台帳の保存期間", a: "5年（当面3年）", note: "2020年改正で延長" },
+        { q: "36協定の有効期間（上限）", a: "1年間", note: "自動更新条項は無効" },
+      ],
+      "母性保護・年少者": [
+        { q: "産前休業の期間", a: "出産予定日前6週間（多胎14週間）", note: "本人の請求が必要" },
+        { q: "産後休業の期間", a: "出産後8週間", note: "6週間後は医師許可の業務に就ける" },
+        { q: "育児時間（1日）", a: "少なくとも2回・各30分以上", note: "生後1年未満の子を持つ女性" },
+        { q: "最低年齢（原則）", a: "15歳（義務教育終了後）", note: "満15歳到達後の最初の3月31日経過後" },
+        { q: "深夜業禁止年齢", a: "18歳未満", note: "例外あり（交替制・農林水産業等）" },
+        { q: "変形労働時間制の適用禁止年齢", a: "18歳未満", note: "フレックスも不可" },
+      ],
+    }
+  },
+  {
+    name: "労働安全衛生法",
+    sections: {
+      "管理者の選任義務人数": [
+        { q: "総括安全衛生管理者（林業・建設業・運送業・清掃業）", a: "100人以上", note: "" },
+        { q: "総括安全衛生管理者（製造業・電気・ガス・採石業等）", a: "300人以上", note: "" },
+        { q: "総括安全衛生管理者（金融・保険・小売等）", a: "1,000人以上", note: "" },
+        { q: "安全管理者の選任義務", a: "50人以上（一定業種）", note: "" },
+        { q: "衛生管理者の選任義務", a: "50人以上（全業種）", note: "" },
+        { q: "産業医の選任義務", a: "50人以上", note: "" },
+        { q: "専属産業医の選任義務", a: "1,000人以上", note: "有害業務従事者500人以上でも専属" },
+        { q: "安全委員会・衛生委員会の設置義務", a: "50人以上", note: "毎月1回以上開催" },
+      ],
+      "衛生管理者の人数基準": [
+        { q: "衛生管理者の人数（200人以下）", a: "1人", note: "" },
+        { q: "衛生管理者の人数（200人超〜500人以下）", a: "2人", note: "" },
+        { q: "衛生管理者の人数（500人超〜1,000人以下）", a: "3人", note: "" },
+        { q: "衛生管理者の人数（1,000人超〜2,000人以下）", a: "4人", note: "" },
+        { q: "衛生管理者の人数（2,000人超〜3,000人以下）", a: "5人", note: "" },
+        { q: "衛生管理者の人数（3,000人超）", a: "6人", note: "" },
+      ],
+      "健康診断・ストレスチェック": [
+        { q: "定期健康診断の間隔", a: "1年以内ごとに1回", note: "常時使用する全労働者が対象" },
+        { q: "特定業務従事者の健康診断間隔", a: "6ヶ月以内ごとに1回", note: "深夜業・坑内労働・有害業務等" },
+        { q: "定期健康診断結果の保存期間", a: "5年間", note: "" },
+        { q: "じん肺健康診断記録の保存期間", a: "7年間", note: "" },
+        { q: "放射線・特化物等の特殊健診の保存期間", a: "30年間", note: "長期保存が必要な有害業務" },
+        { q: "健康診断結果の報告義務（人数）", a: "50人以上の事業場", note: "定期健康診断のみ報告義務あり" },
+        { q: "ストレスチェックの実施義務", a: "50人以上・1年以内ごとに1回", note: "" },
+        { q: "ストレスチェック結果の保存期間", a: "5年間", note: "" },
+        { q: "面接指導の実施要件", a: "時間外・休日労働が月80時間超＋本人申出", note: "" },
+      ],
+    }
+  },
+  {
+    name: "労災保険法",
+    sections: {
+      "給付率・給付額": [
+        { q: "療養補償給付の自己負担", a: "なし（全額給付）", note: "指定医療機関は現物給付" },
+        { q: "休業補償給付の給付率", a: "給付基礎日額の60%", note: "待期3日間は事業主が補償" },
+        { q: "休業特別支給金の率", a: "給付基礎日額の20%", note: "給付60%＋特別支給20%＝実質80%" },
+        { q: "休業補償給付の待期期間", a: "3日間", note: "" },
+        { q: "傷病補償年金への移行条件", a: "1年6ヶ月経過後も治癒せず傷病等級1〜3級", note: "" },
+        { q: "障害補償年金（第1級）の給付日数", a: "313日分/年", note: "第7級は131日分" },
+        { q: "障害補償一時金（第8級）の給付日数", a: "503日分", note: "第14級は56日分" },
+        { q: "遺族補償年金（受給者1人）の給付日数", a: "153日分/年", note: "2人は201日分・4人以上は245日分" },
+        { q: "遺族補償一時金の給付日数", a: "1,000日分", note: "遺族補償年金受給者がいない場合" },
+        { q: "葬祭料の計算式", a: "315,000円＋給付基礎日額×30日", note: "最低：給付基礎日額×60日分" },
+        { q: "障害特別支給金（第1級）", a: "342万円", note: "第14級は8万円" },
+        { q: "遺族特別支給金", a: "300万円（一律）", note: "" },
+      ],
+      "時効・費用徴収": [
+        { q: "療養・休業・葬祭料の時効", a: "2年", note: "" },
+        { q: "障害・遺族補償給付の時効", a: "5年", note: "" },
+        { q: "費用徴収（労働者の故意の場合）", a: "全額", note: "" },
+        { q: "費用徴収（重大な過失の場合）", a: "40%", note: "" },
+        { q: "未手続事業主への遡及徴収期間", a: "2年間", note: "" },
+      ],
+    }
+  },
+  {
+    name: "雇用保険法",
+    sections: {
+      "被保険者資格": [
+        { q: "一般被保険者の週所定労働時間要件", a: "20時間以上", note: "かつ31日以上雇用見込み" },
+        { q: "高年齢被保険者の年齢", a: "65歳以上", note: "2017年改正で新設" },
+        { q: "受給資格の最低被保険者期間（一般）", a: "離職前2年間に12ヶ月以上", note: "賃金支払基礎日数11日以上の月" },
+        { q: "受給資格（特定受給資格者・倒産解雇等）", a: "離職前1年間に6ヶ月以上", note: "" },
+      ],
+      "基本手当（給付日数）": [
+        { q: "被保険者期間1年未満（一般）", a: "90日", note: "" },
+        { q: "被保険者期間5年以上10年未満（45歳未満）", a: "120日", note: "" },
+        { q: "被保険者期間10年以上20年未満（45歳未満）", a: "150日", note: "" },
+        { q: "被保険者期間20年以上（45〜60歳未満）", a: "180日", note: "" },
+        { q: "就職困難者（45歳未満）", a: "300日", note: "障害者等" },
+        { q: "就職困難者（45歳以上65歳未満）", a: "360日", note: "最高日数" },
+        { q: "特定受給資格者・30歳未満（5〜10年未満）", a: "180日", note: "" },
+        { q: "特定受給資格者・45〜60歳未満（20年以上）", a: "330日", note: "" },
+      ],
+      "基本手当（給付率・待期・制限）": [
+        { q: "基本手当の給付率（低賃金者）", a: "80%", note: "" },
+        { q: "基本手当の給付率（高賃金者）", a: "50%", note: "" },
+        { q: "待期期間", a: "7日間", note: "全ての離職者共通" },
+        { q: "給付制限（自己都合退職・原則）", a: "2ヶ月", note: "5年間で3回目以降は3ヶ月" },
+        { q: "受給期間（基本手当）", a: "離職翌日から1年間", note: "延長事由あれば最大4年間" },
+        { q: "高年齢求職者給付金（1年以上）", a: "50日分", note: "1年未満は30日分" },
+      ],
+      "各種給付": [
+        { q: "再就職手当（残日数3分の2以上）の支給率", a: "基本手当日額×70%×残日数", note: "" },
+        { q: "再就職手当（残日数3分の1以上）の支給率", a: "基本手当日額×60%×残日数", note: "" },
+        { q: "教育訓練給付（一般）の給付率", a: "受講費用の20%", note: "上限10万円" },
+        { q: "教育訓練給付（専門実践）の給付率", a: "受講費用の50%（最大70%）", note: "年間上限40万円（最大56万円）" },
+        { q: "育児休業給付（開始〜180日）の給付率", a: "休業開始時賃金の67%", note: "" },
+        { q: "育児休業給付（181日〜）の給付率", a: "休業開始時賃金の50%", note: "" },
+        { q: "介護休業給付の給付率", a: "休業開始時賃金の67%", note: "上限93日・3回分割可" },
+        { q: "高年齢雇用継続基本給付の支給率", a: "各月の賃金×最大15%", note: "60歳時賃金の61%以下の場合" },
+      ],
+      "保険料率": [
+        { q: "雇用保険料率・労働者負担（一般事業）", a: "6/1,000", note: "事業主は9.5/1,000（2024年度）" },
+        { q: "雇用保険の時効（保険料還付請求）", a: "2年", note: "" },
+      ],
+    }
+  },
+  {
+    name: "健康保険法",
+    sections: {
+      "自己負担・給付率": [
+        { q: "療養の給付（一般・70歳未満）", a: "3割負担（給付7割）", note: "" },
+        { q: "療養の給付（70歳以上75歳未満・一般）", a: "2割負担（給付8割）", note: "現役並み所得者は3割" },
+        { q: "療養の給付（義務教育就学前）", a: "2割負担（給付8割）", note: "" },
+        { q: "入院時食事療養費の標準負担額（一般）", a: "1食460円", note: "" },
+        { q: "高額療養費（一般所得・月）", a: "80,100円＋（医療費−267,000円）×1%", note: "" },
+        { q: "高額療養費の多数回該当（3回後）", a: "44,400円", note: "一般所得の場合" },
+      ],
+      "傷病手当金・出産": [
+        { q: "傷病手当金の待期期間", a: "3日間（連続）", note: "3日目まで支給なし" },
+        { q: "傷病手当金の給付率", a: "標準報酬日額の3分の2", note: "約67%" },
+        { q: "傷病手当金の支給期間", a: "通算1年6ヶ月", note: "2022年改正で「通算」に変更" },
+        { q: "出産手当金の支給期間（産前）", a: "出産予定日前42日（多胎98日）", note: "" },
+        { q: "出産手当金の支給期間（産後）", a: "出産後56日", note: "" },
+        { q: "出産手当金の給付率", a: "標準報酬日額の3分の2", note: "" },
+        { q: "出産育児一時金", a: "50万円", note: "産科医療補償制度対象外は48.8万円" },
+      ],
+      "被保険者資格": [
+        { q: "任意継続の申請期限", a: "退職日翌日から20日以内", note: "" },
+        { q: "任意継続の継続期間", a: "2年間", note: "" },
+        { q: "被扶養者の年収要件（一般）", a: "130万円未満", note: "60歳以上・障害者は180万円未満" },
+      ],
+      "標準報酬月額": [
+        { q: "健康保険の標準報酬月額の等級数", a: "50等級", note: "58,000円〜1,390,000円" },
+        { q: "厚生年金の標準報酬月額の等級数", a: "32等級", note: "88,000円〜650,000円" },
+        { q: "定時決定（算定基礎届）の対象月", a: "4月・5月・6月の報酬", note: "7月に改定" },
+        { q: "随時改定（月額変更）の要件", a: "2等級以上の差", note: "継続3ヶ月の平均が2等級以上変動" },
+        { q: "標準賞与額の上限（健康保険）", a: "年573万円", note: "" },
+        { q: "標準賞与額の上限（厚生年金）", a: "1回150万円", note: "" },
+      ],
+      "時効・その他": [
+        { q: "保険料の時効", a: "2年", note: "" },
+        { q: "保険給付の時効（請求権）", a: "2年", note: "" },
+        { q: "保険料免除（育児・産前産後休業中）", a: "全額免除", note: "被保険者・事業主分とも" },
+      ],
+    }
+  },
+  {
+    name: "厚生年金保険法",
+    sections: {
+      "被保険者・保険料": [
+        { q: "厚生年金の被保険者の年齢上限", a: "70歳未満", note: "70歳になった月に資格喪失" },
+        { q: "厚生年金保険料率（現行）", a: "18.3%（労使折半）", note: "2017年9月から固定" },
+        { q: "保険料の時効", a: "2年", note: "" },
+      ],
+      "老齢年金": [
+        { q: "老齢厚生年金の支給開始年齢（原則）", a: "65歳", note: "経過措置で60歳代前半の特別支給あり" },
+        { q: "老齢厚生年金の繰下げ増額率（月）", a: "0.7%", note: "最大75歳まで・最大84%増" },
+        { q: "老齢厚生年金の繰上げ減額率（月）", a: "0.4%", note: "最大24%減" },
+        { q: "在職老齢年金の支給停止基準額", a: "基本月額＋総報酬月額相当額が50万円超", note: "60歳以上65歳未満・65歳以上とも同一" },
+        { q: "加給年金の対象配偶者の年齢要件", a: "65歳未満", note: "被保険者期間20年以上が条件" },
+        { q: "加給年金の対象配偶者の年収要件", a: "850万円未満", note: "所得655.5万円未満" },
+      ],
+      "障害・遺族年金": [
+        { q: "障害厚生年金の保険料納付要件", a: "初診日前々月までに3分の2以上納付", note: "または直近1年間に滞納なし" },
+        { q: "障害厚生年金（第3級）の最低保障額", a: "報酬比例年金額の4分の3", note: "" },
+        { q: "遺族厚生年金の額", a: "死亡者の老齢厚生年金の4分の3", note: "報酬比例部分" },
+        { q: "中高齢寡婦加算の年齢要件", a: "40歳以上65歳未満の妻", note: "子のない妻に加算" },
+      ],
+    }
+  },
+  {
+    name: "国民年金法",
+    sections: {
+      "被保険者・保険料": [
+        { q: "第1号被保険者の年齢要件", a: "20歳以上60歳未満", note: "日本国内在住の自営業者等" },
+        { q: "第3号被保険者の年収要件", a: "130万円未満（60歳未満）", note: "第2号被保険者に扶養される配偶者" },
+        { q: "国民年金保険料（2024年度）", a: "16,980円/月", note: "毎年改定あり" },
+        { q: "付加年金の保険料", a: "400円/月（第1号被保険者のみ）", note: "国民年金基金と併用不可" },
+        { q: "保険料の追納可能期間", a: "10年以内", note: "免除・納付猶予を受けた期間" },
+        { q: "保険料の時効", a: "2年", note: "" },
+        { q: "産前産後免除期間", a: "産前4ヶ月・産後1ヶ月（合計6ヶ月）", note: "" },
+      ],
+      "老齢基礎年金": [
+        { q: "老齢基礎年金の受給資格期間", a: "10年以上", note: "2017年改正で25年→10年に短縮" },
+        { q: "老齢基礎年金の満額支給の納付期間", a: "40年（480ヶ月）", note: "" },
+        { q: "老齢基礎年金の繰上げ減額率（月）", a: "0.4%", note: "最大5年繰上げ→最大24%減" },
+        { q: "老齢基礎年金の繰下げ増額率（月）", a: "0.7%", note: "最大75歳まで→最大84%増" },
+        { q: "全額免除期間の年金額反映割合", a: "2分の1（国庫負担分のみ）", note: "2009年4月以降" },
+        { q: "半額免除の年金額反映割合", a: "4分の3", note: "" },
+        { q: "4分の1免除の年金額反映割合", a: "8分の7", note: "" },
+        { q: "4分の3免除の年金額反映割合", a: "8分の5", note: "" },
+      ],
+      "各種給付": [
+        { q: "付加年金の年金額", a: "200円×付加保険料納付月数", note: "2年で元が取れる計算" },
+        { q: "寡婦年金の支給期間", a: "60歳〜65歳", note: "第1号被保険者の夫が死亡した妻" },
+        { q: "寡婦年金の支給額", a: "夫の老齢基礎年金額の4分の3", note: "" },
+        { q: "死亡一時金（保険料納付36〜180月）", a: "12万円", note: "" },
+        { q: "死亡一時金（保険料納付420月以上）", a: "32万円", note: "" },
+        { q: "死亡一時金に付加年金がある場合の加算", a: "8,500円加算", note: "" },
+        { q: "障害基礎年金（第1級）の年金額", a: "老齢基礎年金満額×1.25", note: "" },
+        { q: "障害基礎年金（第2級）の年金額", a: "老齢基礎年金満額×1.0", note: "" },
+        { q: "遺族基礎年金の子の要件", a: "18歳年度末まで（障害1・2級は20歳未満）", note: "" },
+      ],
+    }
+  },
+  {
+    name: "労働保険徴収法",
+    sections: {
+      "申告・納付": [
+        { q: "年度更新（概算保険料申告）の期限", a: "毎年6月1日〜7月10日", note: "" },
+        { q: "保険料の延納（分割）の回数", a: "3回（4月・8月・11月期）", note: "概算保険料40万円以上等" },
+        { q: "確定保険料申告書の提出期限", a: "毎年6月1日〜7月10日", note: "前年度分の確定申告" },
+        { q: "労災・雇用保険の成立届の提出期限", a: "保険関係成立の翌日から10日以内", note: "" },
+        { q: "概算保険料の申告・納付期限（新規成立）", a: "保険関係成立の翌日から50日以内", note: "" },
+        { q: "保険料の時効（徴収・還付請求）", a: "2年", note: "" },
+      ],
+      "保険料率・メリット制": [
+        { q: "雇用保険料率（一般事業・合計）", a: "15.5/1,000（2024年度）", note: "労働者6/1,000・事業主9.5/1,000" },
+        { q: "メリット制の適用要件（継続事業）", a: "100人以上または料率×賃金×0.4が40万円以上", note: "" },
+        { q: "メリット制の増減幅", a: "±40%", note: "3年間の収支率で増減" },
+        { q: "有期事業の一括（建設工事）の対象額", a: "労務費概算1億8,000万円未満", note: "" },
+      ],
+    }
+  },
+  {
+    name: "労働保険一般常識",
+    sections: {
+      "育児・介護休業法": [
+        { q: "育児休業の取得可能期間", a: "原則子が1歳まで（最大2歳まで延長可）", note: "" },
+        { q: "産後パパ育休（出生時育児休業）の期間", a: "子の出生後8週間以内に4週間まで", note: "2022年10月新設" },
+        { q: "産後パパ育休の分割取得", a: "2回まで", note: "" },
+        { q: "育児休業の分割取得（通常）", a: "2回まで", note: "" },
+        { q: "子の看護休暇（子1人）", a: "年5日", note: "子2人以上は年10日" },
+        { q: "介護休業の取得可能期間（通算）", a: "対象家族1人につき93日", note: "3回まで分割可" },
+        { q: "介護休暇（対象家族1人）", a: "年5日", note: "2人以上は年10日" },
+        { q: "短時間勤務の義務（育児）", a: "3歳未満の子を養育する労働者", note: "1日6時間が標準" },
+        { q: "残業免除請求権の対象年齢（育児）", a: "3歳未満の子を養育する場合", note: "" },
+        { q: "時間外労働の制限（育児）", a: "小学校就学前の子を養育する場合", note: "1ヶ月24時間・年150時間" },
+      ],
+      "最低賃金・労働契約法": [
+        { q: "最低賃金法違反の罰則", a: "50万円以下の罰金", note: "" },
+        { q: "無期転換ルールの要件", a: "通算5年超で本人が申込みをした場合", note: "申込みがなければ転換されない" },
+        { q: "雇止め法理の根拠", a: "実態として無期契約と同視できる等", note: "合理的理由がなければ雇止め無効" },
+      ],
+      "高年齢者雇用安定法等": [
+        { q: "定年の最低年齢", a: "60歳以上", note: "60歳未満の定年は禁止" },
+        { q: "65歳までの雇用確保義務（3択）", a: "①定年廃止 ②65歳以上に延長 ③再雇用制度", note: "いずれかを義務として講じる必要あり" },
+        { q: "70歳までの就業確保措置", a: "2021年4月から努力義務化", note: "5択のいずれか" },
+        { q: "パワハラ防止措置義務の施行（大企業）", a: "2020年6月1日", note: "中小企業は2022年4月1日" },
+      ],
+    }
+  },
+  {
+    name: "社会保険一般常識",
+    sections: {
+      "介護保険法": [
+        { q: "介護保険の第1号被保険者の年齢", a: "65歳以上", note: "市区町村が保険者" },
+        { q: "介護保険の第2号被保険者の年齢", a: "40歳以上65歳未満", note: "医療保険加入者が対象" },
+        { q: "要介護認定の審査期間（原則）", a: "申請から30日以内", note: "" },
+        { q: "居宅サービスの自己負担割合（一般）", a: "1割", note: "所得に応じ2割・3割" },
+        { q: "第1号保険料の特別徴収（天引き）の分岐", a: "年金18万円以上", note: "18万円未満は普通徴収" },
+      ],
+      "国民健康保険・船員保険": [
+        { q: "国民健康保険の保険者", a: "市区町村・国民健康保険組合", note: "2018年から都道府県も共同保険者" },
+        { q: "国民健康保険の自己負担（一般）", a: "3割", note: "健康保険と同じ" },
+        { q: "船員保険の保険者", a: "全国健康保険協会（協会けんぽ）", note: "2010年改正で統合" },
+        { q: "船員保険の行方不明手当金の支給期間", a: "3ヶ月", note: "遺族への給付" },
+      ],
+      "社労士法・試験": [
+        { q: "社労士の業務（1号業務）", a: "申請書等の作成・提出代行", note: "独占業務" },
+        { q: "社労士の業務（2号業務）", a: "帳簿書類の作成", note: "独占業務" },
+        { q: "社労士の業務（3号業務）", a: "相談・指導（コンサルティング）", note: "非独占業務" },
+        { q: "試験の合格基準（選択式）", a: "総点数の7割以上かつ各科目3点以上", note: "補正あり" },
+        { q: "試験の合格基準（択一式）", a: "総点数の7割以上かつ各科目4点以上", note: "補正あり" },
+      ],
+    }
+  },
+];
+
+// 状態管理
+let currentSubjectIdx = 0;
+let currentSection = "ALL";
+let seenCards = new Set();
+let totalCards = 0;
+
+// 総カード数計算
+subjects.forEach(sub => {
+  Object.values(sub.sections).forEach(arr => totalCards += arr.length);
+});
+
+function getCardId(subIdx, section, cardIdx) {
+  return `${subIdx}_${section}_${cardIdx}`;
+}
+
+// サイドバー・モバイルナビ生成
+const sidebar = document.getElementById('sidebar');
+const mobileNav = document.getElementById('mobile-subject-nav');
+
+subjects.forEach((sub, i) => {
+  const count = Object.values(sub.sections).reduce((s, a) => s + a.length, 0);
+
+  const btn = document.createElement('button');
+  btn.className = 'sidebar-btn' + (i === 0 ? ' active' : '');
+  btn.innerHTML = sub.name + `<span class="sidebar-count">${count}</span>`;
+  btn.onclick = () => selectSubject(i);
+  sidebar.appendChild(btn);
+
+  const mBtn = document.createElement('button');
+  mBtn.className = 'mobile-subject-btn' + (i === 0 ? ' active' : '');
+  mBtn.textContent = sub.name;
+  mBtn.onclick = () => selectSubject(i);
+  mobileNav.appendChild(mBtn);
+});
+
+function selectSubject(i) {
+  currentSubjectIdx = i;
+  currentSection = "ALL";
+  document.querySelectorAll('.sidebar-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+  document.querySelectorAll('.mobile-subject-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+  renderSectionNav();
+  renderCards();
+}
+
+function renderSectionNav() {
+  const sectionNav = document.getElementById('section-nav');
+  sectionNav.innerHTML = '';
+  const sub = subjects[currentSubjectIdx];
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'section-btn' + (currentSection === 'ALL' ? ' active' : '');
+  allBtn.textContent = 'すべて';
+  allBtn.onclick = () => { currentSection = 'ALL'; updateSectionBtns(); renderCards(); };
+  sectionNav.appendChild(allBtn);
+
+  Object.keys(sub.sections).forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'section-btn' + (currentSection === name ? ' active' : '');
+    btn.textContent = name;
+    btn.onclick = () => { currentSection = name; updateSectionBtns(); renderCards(); };
+    sectionNav.appendChild(btn);
+  });
+}
+
+function updateSectionBtns() {
+  const btns = document.querySelectorAll('.section-btn');
+  const keys = ['ALL', ...Object.keys(subjects[currentSubjectIdx].sections)];
+  btns.forEach((b, i) => b.classList.toggle('active', keys[i] === currentSection));
+}
+
+function renderCards() {
+  const sub = subjects[currentSubjectIdx];
+  let cards = [];
+  let cardIds = [];
+
+  if (currentSection === 'ALL') {
+    Object.entries(sub.sections).forEach(([sname, arr]) => {
+      arr.forEach((c, ci) => {
+        cards.push(c);
+        cardIds.push(getCardId(currentSubjectIdx, sname, ci));
+      });
+    });
+  } else {
+    (sub.sections[currentSection] || []).forEach((c, ci) => {
+      cards.push(c);
+      cardIds.push(getCardId(currentSubjectIdx, currentSection, ci));
+    });
+  }
+
+  const grid = document.getElementById('cards-grid');
+  grid.innerHTML = '';
+
+  cards.forEach((c, idx) => {
+    const id = cardIds[idx];
+    const div = document.createElement('div');
+    div.className = 'card' + (seenCards.has(id) ? ' flipped' : '');
+    div.innerHTML = `
+      <div class="front">
+        <div class="card-tag">問題</div>
+        <div class="card-q">${c.q}</div>
+      </div>
+      <div class="back">
+        <div class="card-badge">答え</div>
+        <div class="card-a">${c.a}</div>
+        ${c.note ? `<div class="card-note">${c.note}</div>` : ''}
+      </div>`;
+    div.onclick = () => {
+      div.classList.toggle('flipped');
+      if (div.classList.contains('flipped')) {
+        seenCards.add(id);
+      } else {
+        seenCards.delete(id);
+      }
+      updateProgress(cards, cardIds);
+      updateHeaderStats();
+    };
+    grid.appendChild(div);
+  });
+
+  updateProgress(cards, cardIds);
+}
+
+function updateProgress(cards, cardIds) {
+  const seen = cardIds.filter(id => seenCards.has(id)).length;
+  const total = cards.length;
+  const pct = total > 0 ? Math.round(seen / total * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-nums').textContent = seen + ' / ' + total;
+}
+
+function updateHeaderStats() {
+  document.getElementById('total-count').textContent = totalCards;
+  document.getElementById('seen-count').textContent = seenCards.size;
+}
+
+function resetFlips() {
+  const sub = subjects[currentSubjectIdx];
+  let cardIds = [];
+  if (currentSection === 'ALL') {
+    Object.entries(sub.sections).forEach(([sname, arr]) => {
+      arr.forEach((_, ci) => cardIds.push(getCardId(currentSubjectIdx, sname, ci)));
+    });
+  } else {
+    (sub.sections[currentSection] || []).forEach((_, ci) => {
+      cardIds.push(getCardId(currentSubjectIdx, currentSection, ci));
+    });
+  }
+  cardIds.forEach(id => seenCards.delete(id));
+  renderCards();
+  updateHeaderStats();
+}
+
+// 初期化
+updateHeaderStats();
+renderSectionNav();
+renderCards();
+</script>
+</body>
+</html>
